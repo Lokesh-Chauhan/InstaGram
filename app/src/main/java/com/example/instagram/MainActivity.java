@@ -26,8 +26,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         setTitle("SignUp");
+
+        if (ParseUser.getCurrentUser()!=null){
+            socialMediaActivity();}
 
         final ProgressDialog progressDialog=new ProgressDialog(this);
         edtUsername = findViewById(R.id.edtUsername);
@@ -35,10 +37,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         edtPassword = findViewById(R.id.edtPassword);
         btnSignUp = findViewById(R.id.btnSignUp);
         btnLogIn = findViewById(R.id.btnLogIn);
-
-        if (ParseUser.getCurrentUser()!=null){
-            socialMediaActivity();
-        }
 
         btnSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -51,14 +49,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     parseUser.put("username", edtUsername.getText().toString());
                     parseUser.put("email", edtEmail.getText().toString());
                     parseUser.put("password", edtPassword.getText().toString());
-
                     parseUser.signUpInBackground(new SignUpCallback() {
                         @Override
                         public void done(ParseException e) {
-                            progressDialog.setMessage("Signing In" + edtUsername.getText().toString());
-                            progressDialog.show();
                             Toast.makeText(MainActivity.this, "Success", Toast.LENGTH_LONG).show();
-                            progressDialog.dismiss();
                             socialMediaActivity();
                         }
                     });
@@ -73,8 +67,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
         if (ParseUser.getCurrentUser()!=null){
-            ParseUser.getCurrentUser().logOut();
-        }
+            socialMediaActivity();        }
     }
 
     @Override
