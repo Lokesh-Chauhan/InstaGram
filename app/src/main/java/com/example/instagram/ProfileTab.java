@@ -1,5 +1,6 @@
 package com.example.instagram;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -7,6 +8,14 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
+
+import com.parse.LogOutCallback;
+import com.parse.ParseException;
+import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -14,6 +23,9 @@ import android.view.ViewGroup;
  * create an instance of this fragment.
  */
 public class ProfileTab extends Fragment {
+
+    private EditText edtProfileName,edtProfession,edtHobbies,edtSport,edtBio;
+    private Button btnUpdateInfo,btnLogout;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -59,6 +71,80 @@ public class ProfileTab extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_profile_tab, container, false);
+        View view= inflater.inflate(R.layout.fragment_profile_tab, container, false);
+        edtProfileName=view.findViewById(R.id.edtProfileName);
+        edtBio=view.findViewById(R.id.edtBio);
+        edtProfession=view.findViewById(R.id.edtProfession);
+        edtHobbies=view.findViewById(R.id.edtHobbies);
+        edtSport=view.findViewById(R.id.edtSport);
+        btnLogout=view.findViewById(R.id.btnLogout);
+        btnUpdateInfo=view.findViewById(R.id.btnUpdateinfo);
+        ParseUser parseUser=ParseUser.getCurrentUser();
+        if (parseUser.get("profileName")==null){
+            edtProfileName.setText("");
+        }else {
+            edtProfileName.setText(parseUser.get("profileName").toString()+"");
+        }
+        if (parseUser.get("bio")==null){
+            edtBio.setText("");
+        }else {
+            edtBio.setText(parseUser.get("bio").toString()+"");
+        }
+        if (parseUser.get("profession")==null){
+            edtProfession.setText("");
+        }else {
+            edtProfession.setText(parseUser.get("profession").toString()+"");
+        }
+        if (parseUser.get("hobbies")==null){
+            edtHobbies.setText("");
+        }else {
+            edtHobbies.setText(parseUser.get("hobbies").toString()+"");
+        }
+        if (parseUser.get("sport")==null){
+            edtSport.setText("");
+        }else {
+            edtSport.setText(parseUser.get("sport").toString()+"");
+        }
+
+        btnUpdateInfo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ParseUser parseUser=ParseUser.getCurrentUser();
+                parseUser.put("profileName",edtProfileName.getText().toString());
+                parseUser.put("bio",edtBio.getText().toString());
+                parseUser.put("profession",edtProfession.getText().toString());
+                parseUser.put("hobbies",edtHobbies.getText().toString());
+                parseUser.put("sport",edtSport.getText().toString());
+                parseUser.saveInBackground(new SaveCallback() {
+                    @Override
+                    public void done(ParseException e) {
+                        if(e==null){
+                            Toast.makeText(getContext(),"Successfully Updated",Toast.LENGTH_LONG).show();
+                        }
+                        else {
+                            Toast.makeText(getContext(),e.getMessage(),Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
+            }
+        });
+
+        btnLogout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ParseUser.logOutInBackground(new LogOutCallback() {
+                    @Override
+                    public void done(ParseException e) {
+                        if(e==null){
+                            Toast.makeText(getContext(),"Logout Successfull",Toast.LENGTH_LONG).show();
+                            Intent intent=new Intent(getContext(),MainActivity.class);
+                            startActivity(intent);
+                        }
+                    }
+                });
+
+            }
+        });
+        return view;
     }
 }
